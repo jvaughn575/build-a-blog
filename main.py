@@ -23,15 +23,48 @@ jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),au
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        self.response.write('Hello world!')
+        self.redirect("/blog")
 
 class BlogHandler(webapp2.RequestHandler):
     def get(self):
-        t = jinja_env.get_template('blog-list.html')
+        t = jinja_env.get_template('base.html')
+        content = t.render(blogs="Under Development - See your Blogs Soon!")
+        self.response.write(content)
+
+class NewBlogHandler(webapp2.RequestHandler):
+    def get(self):
+        t = jinja_env.get_template('new-blog-form.html')
         content = t.render()
-        return content
+        self.response.write(content)
+
+    def post(self):
+        title = self.request.get('title').strip()
+        new_post = self.request.get('new_post').strip()
+
+        error_title = ""
+        error_new_post = ""
+
+        if not title:
+            error_title = "You need to add a title!"
+        if not new_post:
+            error_new_post = "You need to write your post!"
+
+        if title and new_post:
+            self.redirect("/")
+
+
+        else:
+            t = jinja_env.get_template('new-blog-form.html')
+            content = t.render(error_title = error_title,
+                               error_new_post = error_new_post,
+                               title=title,
+                               new_post=new_post)
+            self.response.write(content)
+
+
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/blog',BlogHandler),
+    ('/blog/newpost',NewBlogHandler)
 ], debug=True)
