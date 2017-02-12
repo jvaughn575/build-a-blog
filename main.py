@@ -18,6 +18,9 @@ import os
 import webapp2
 import jinja2
 
+# import Google datastore db
+from google.appengine.ext import db
+
 template_dir = os.path.join(os.path.dirname(__file__), "templates")
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir),autoescape = True)
 
@@ -25,10 +28,11 @@ class MainHandler(webapp2.RequestHandler):
     def get(self):
         self.redirect("/blog")
 
-class BlogHandler(webapp2.RequestHandler):
+class BlogListHandler(webapp2.RequestHandler):
     def get(self):
-        t = jinja_env.get_template('base.html')
-        content = t.render(blogs="Under Development - See your Blogs Soon!")
+        blog_entries = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC LIMIT 5")
+        t = jinja_env.get_template('display-blog.html')
+        content = t.render(posts=blog_entries)
         self.response.write(content)
 
 class NewBlogHandler(webapp2.RequestHandler):
@@ -39,32 +43,44 @@ class NewBlogHandler(webapp2.RequestHandler):
 
     def post(self):
         title = self.request.get('title').strip()
-        new_post = self.request.get('new_post').strip()
+        body = self.request.get('body').strip()
 
         error_title = ""
-        error_new_post = ""
+        error_body = ""
 
         if not title:
             error_title = "You need to add a title!"
-        if not new_post:
-            error_new_post = "You need to write your post!"
+        if not body:
+            error_body = "You need to write your post!"
 
-        if title and new_post:
+        if title and body:
+            b = Post(title = title, body = body)
+            b.put()
             self.redirect("/")
 
 
         else:
             t = jinja_env.get_template('new-blog-form.html')
             content = t.render(error_title = error_title,
-                               error_new_post = error_new_post,
+                               error_body = error_body,
                                title=title,
-                               new_post=new_post)
+                               body=body)
             self.response.write(content)
 
+class ViewPostHandler(webapp2.RequestHandler):
+    def get(self, id):
+        self.response.write(id)
 
+
+# Make Blog model class
+class Post(db.Model):
+    title = db.StringProperty(required = True)
+    body = db.TextProperty(required = True)
+    created = db.DateTimeProperty(auto_now_add = True)
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
-    ('/blog',BlogHandler),
-    ('/blog/newpost',NewBlogHandler)
+    ('/blog',BlogListHandler),
+    ('/blog/newpost',NewBlogHandler),
+    webapp2.Route(r'/blog/<id:\d+>', ViewPostHandler),
 ], debug=True)
