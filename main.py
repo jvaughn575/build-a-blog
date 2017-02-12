@@ -31,7 +31,7 @@ class MainHandler(webapp2.RequestHandler):
 class BlogListHandler(webapp2.RequestHandler):
     def get(self):
         blog_entries = db.GqlQuery("SELECT * FROM Post ORDER BY created DESC LIMIT 5")
-        t = jinja_env.get_template('display-blog.html')
+        t = jinja_env.get_template('display-posts.html')
         content = t.render(posts=blog_entries)
         self.response.write(content)
 
@@ -69,7 +69,12 @@ class NewBlogHandler(webapp2.RequestHandler):
 
 class ViewPostHandler(webapp2.RequestHandler):
     def get(self, id):
-        self.response.write(id)
+        #self.response.write(id)
+        post = Post.get_by_id(int(id))
+        if post:
+            t = jinja_env.get_template('display-posts.html')
+            content = t.render(posts = [post])
+            self.response.write(content)
 
 
 # Make Blog model class
