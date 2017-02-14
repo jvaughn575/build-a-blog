@@ -1,24 +1,48 @@
 {% extends "base.html" %}
 {% block content %}
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">Build A Blog</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li ><a href="/blog">Home</a></li>
+            <li class="active"><a href="/blog/newpost">New Post</a></li>
+        </ul>
+    </div>
+</nav>
 
-<h1> New Post </h1>
-<form action="/blog/newpost" method="post">
-    <label>
-        Title
-        <input type="text" name="title" value={{title}}>
-        {{error_title}}
+<div class="container-fluid">
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-8" >
 
-    </label>
+        <h1> New Post </h1>
+        <form action="/blog/newpost" method="post">
+            <label>
+                <span style="margin-right:350px">Title</span>
+            <br>
+                <div>
+                <input type="text" name="title" value={{title}}>
+                <p class="error">{{error_title}}</p>
+                </div>
 
-    <br>
-    <label>
-        Post
-        <textarea name="body">{{body}}</textarea>
-        {{error_body}}
-    </label>
-    <br>
-    <input type="submit">
-</form>
+            </label>
 
+            <br>
+            <label>
+                <span style="margin-right:350px">Post</span>
+                <br>
+                <textarea name="body">{{body}}</textarea>
+                <p class="error"> {{error_body}} </p>
 
+            </label>
+            <br>
+            <input type="submit">
+        </form>
+
+    </div>
+    <div class="col-md-1"></div>
+</div> <!-- end row -->
+</div> <!--  end div container-fluid -->
 {% endblock %}
