@@ -1,4 +1,9 @@
 
+pre {
+    white-space: pre-wrap;
+    word-break: keep-all;
+}
+
 textarea {
         width: 400px;
         height: 200px;
@@ -15,7 +20,7 @@ textarea {
             label{
                 display: block;
                 font-size: 20px;
-                
+
             }
 
             input[type=text]{

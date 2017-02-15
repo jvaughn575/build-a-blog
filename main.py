@@ -17,6 +17,7 @@
 import os
 import webapp2
 import jinja2
+import time
 
 # import Google datastore db
 from google.appengine.ext import db
@@ -55,10 +56,9 @@ class NewBlogHandler(webapp2.RequestHandler):
 
         if title and body:
             b = Post(title = title, body = body)
-            b.put()
-            self.redirect("/")
-
-
+            id = (b.put()).id()
+            self.redirect("/blog/" + str(id))
+            
         else:
             t = jinja_env.get_template('new-blog-form.html')
             content = t.render(error_title = error_title,
